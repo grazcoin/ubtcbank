@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+function setCookie(c_name,value,exdays)
+{
+var exdate=new Date();
+exdate.setDate(exdate.getDate() + exdays);
+var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+document.cookie=c_name + "=" + c_value + ";path=/;";
+};
+
+var import_cookies = function()
+{
+var json = document.forms[0].elements['msg'].value;
+JSON.parse(json, function(key, value) {
+if (key != "") {
+setCookie(key,value,365);
+}
+});
+}
+
+</script>
+</head>
+<body>
+                <form> 
+                        <textarea name="msg" rows="4" cols="100">Paste here exported json of cookies!</textarea>
+                        <br/>
+                        <input type="button" value="Import Cookies" onclick="import_cookies()"/>
+                </form>
+</body>
+</html>

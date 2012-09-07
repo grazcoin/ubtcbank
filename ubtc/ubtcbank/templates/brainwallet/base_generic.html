@@ -1,0 +1,352 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+    <meta charset="utf-8">
+    <title>Double-signed Wallet</title> 
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="bitcoin address generator" name="description">
+    <meta content="brainwallet" name="author">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/default.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/lock/_style/patternlock.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/lock/_style/patternlock2.css"/>
+    <script src="/static/lock/_script/patternlock.js"></script>
+    <script src="/static/lock/_script/patternlock2.js?2"></script>
+    <script src="/static/js/jquery-1.7.2.min.js"></script> 
+    <script src="/static/js/bootstrap.min.js"></script> 
+    <script src="/static/js/bitcoinjs-min.js"></script> 
+    <script src="/static/js/rfc1751.js"></script> 
+    <script src="/static/js/brainwallet.js?7"></script> 
+    <script src="/static/js/qrcode.js"></script>
+
+<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="favicon.ico" rel="shortcut icon">
+</head>
+<body>
+<div class="navbar navbar-fixed-top"> 
+    <div class="navbar-inner"> 
+        <div class="container"> 
+            <a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse"> 
+            <span class="icon-bar"></span> <span class="icon-bar"></span> 
+            <span class="icon-bar"></span> </a> <a class="brand" href="/">uBTC <img src="/static/img/logo_tiny.png" width=24 height=24 /> Bank</a> 
+            <div class="nav-collapse"> 
+                <ul class="nav">
+{% if active_tab_generator %}
+                    <li class="active">
+{% else %}
+		    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#generator">Get started</a></li> 
+{% if active_tab_done %}
+                    <li class="active">
+{% else %}
+                    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#done" id="tab-done">Secure Address</a></li>
+{% if active_tab_sign %}
+                    <li class="active">
+{% else %}
+                    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#sign" id="tab-sign">Secure payment</a></li>
+{% if active_tab_backup %}
+                    <li class="active">
+{% else %}
+                    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#backup" id="tab-backup">Backup</a></li>
+{% if active_tab_faq %}
+                    <li class="active">
+{% else %}
+                    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#faq" id="tab-faq">FAQ</a></li>
+{% if active_tab_about %}
+                    <li class="active">
+{% else %}
+                    <li>
+{% endif %}
+                    <a data-toggle="tab" href="#about" id="tab-about">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container"> 
+    <div class="tab-content"> 
+
+<!-- Generator -->
+{% if active_tab_generator %}
+        <div class="tab-pane fade in active" id="generator"> 
+{% else %}
+        <div class="tab-pane fade" id="generator"> 
+{% endif %}
+	<form class="form-horizontal" action="/basic/" method="POST">
+	    {% csrf_token %}
+            <fieldset> <legend>Secondary key generator</legend> 
+                <div class="control-group"> 
+                    <div class="row"> 
+                        <div class="span10"> 
+                            <div class="control-group"> 
+                                <label class="control-label" for="from_pass">Get Address From</label> 
+                                <div class="controls"> 
+                                    <div class="btn-group" data-toggle="buttons-radio" id="gen_from"> 
+                                        <button class="btn active" id="from_pass" title="Using SHA256(passphrase) as the secret exponent" type="button">Passphrase</button> 
+                                        <button class="btn" id="from_hash" title="Using hex-encoded secret exponent (32 bytes)" type="button">Secret Exponent</button> 
+                                        <button class="btn" id="from_sec" title="Using Base58Check-encoded secret exponent (ver. 128)" type="button">Private Key</button> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pass">Passphrase</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pass" type="text" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="hash">Secret Exponent</label> 
+                                <div class="controls"> 
+                                    <div class="input-append"> 
+                                        <input class="span5" id="hash" maxlength="64" readonly type="text"><button class="btn" id="random" title="Random" type="button"><i class="icon-repeat"></i></button> 
+                                    </div><span class="help-inline errormsg"></span> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="sec">Private Key (make a paper backup)</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="sec" readonly type="text" name="sec" />
+                                    <span class="help-inline errormsg"></span> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="addr">Secondary Address</label> 
+                                <div class="controls"> 
+                                    <input class="span4" id="addr" readonly type="text" name="addr" />
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pub">Public Key (SEC)</label> 
+                                <div class="controls"> 
+				<textarea name="pub" class="span5" id="pub" readonly rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+			<div class="span5">
+			    <label class="control-label" for="pincode1">Pincode (Memorize!)</label>
+			    <input type="text" id="pincode1" name="pincode1" class="patternlock" />
+			    <input type="submit" value="login"/>
+			</div>
+                    </div>
+                </div>
+            </fieldset>
+            </form>
+        </div>
+
+
+<!-- Done -->
+{% if active_tab_done %}
+        <div class="tab-pane fade in active" id="done">
+{% else %}
+        <div class="tab-pane fade" id="done">
+{% endif %}
+
+        <form class="form-horizontal" action="/basic/pay/" method="POST">
+            {% csrf_token %}
+{% if seen %}
+            <fieldset> <legend>Secure address generator (modified secondary key)</legend>
+{% else %}
+            <fieldset> <legend>Secure address generator</legend>
+{% endif %}
+                <div class="control-group">
+                    <div class="row">
+                        <div class="span10">
+
+                <div class="control-group">
+		     <label class="control-label" for="donePrimary">Primary Address*</label>
+                     <div class="controls">
+                        <input class="span5" id="donePrimary" maxlength="130" type="text" name="donePrimary" value="{{ primary_addr }}"> <button id="generateMulti" class="btn" type="submit" data-target="/basic/pay/">Create secure address</button>
+		     </div>
+		</div>
+                <div class="control-group">
+                    <label class="control-label" for="doneBTCAddr">Secondary Address</label>
+                    <div class="controls">
+			<textarea class="span5" id="doneBTCAddr" readonly rows="1">{{ secondary_addr }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="donePub">Public key (SEC)</label>
+                    <div class="controls">
+			<textarea class="span5" id="donePub" readonly rows="2">{{ secondary_pub }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="doneToken">Token</label>
+                    <div class="controls">
+			<textarea class="span5" id="doneToken" readonly rows="1">{{ token }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="donePincode">Pincode</label>
+                    <div class="controls">
+			<textarea class="span5" id="donePincode" readonly rows="1">{{ pincode }}</textarea>
+                    </div>
+                </div>
+		<p>* or give the pubkey of the address which you can get using:<br /><i>bitcoind <b>validateaddress</b> $ADDR</i></p>
+	    </div>
+	</div>
+    </div>
+	     </fieldset>
+	</form>
+	</div>
+
+<!-- Sign -->
+{% if active_tab_sign %}
+        <div class="tab-pane fade in active" id="sign">
+{% else %}
+        <div class="tab-pane fade" id="sign">
+{% endif %}
+	<form class="form-horizontal" action="/basic/rawtx/" method="POST">
+	    {% csrf_token %}
+            <fieldset> <legend>Make a payment</legend>
+                <div class="control-group"> 
+                    <div class="row"> 
+                        <div class="span10">
+<!--                        <div class="control-group">
+                                <label class="control-label" for="security_method">Security method</label>
+                                <div class="controls">
+                                    <div class="btn-group" data-toggle="buttons-radio" id="security_method">
+                                        <button class="btn active" id="2of2" title="Using 2of2 signature" type="button">2of2</button>
+                                        <button class="btn" id="2of3" title="Using 2of3 signature" type="button">2of3</button>
+                                        <button class="btn" id="3of3" title="Using 3of3 signature" type="button">3of3</button>
+                                    </div>
+                                </div>
+                            </div> --> 
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_to_addr">Pay to address</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_to_addr" type="text" name="pay_to_addr" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_amount">Amount</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_amount" type="text" name="pay_amount" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_fee">Fee</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_fee" type="text" name="pay_fee" value="{{ fee }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_from_addr"><a href="https://blockchain.info/address/{{ secure_addr }}" target="_blank">Secure from address</a></label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_from_addr" type="text" readonly name="pay_from_addr" value="{{ secure_addr }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_sign_addr"><a href="https://blockchain.info/address/{{ primary_addr }}" target="_blank">Primary sign address</a></label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_sign_addr" type="text" readonly name="pay_prim_sign_addr" value="{{ primary_addr }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_sign_addr"><a href="https://blockchain.info/address/{{ secondary_addr }}" target="_blank">Secondary sign address</a></label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_sign_addr" type="text" readonly name="pay_sign_addr" value="{{ secondary_addr }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_change_addr">Change address</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_change_addr" type="text" name="pay_change_addr" value="{{ secure_addr }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group"> 
+                                <label class="control-label" for="pay_token">Token</label> 
+                                <div class="controls"> 
+                                    <input class="span5" id="pay_token" type="text" readonly name="pay_token" value="{{ token }}" /> 
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="pincode2">Enter pincode</label>
+				<div class="span2">
+                                    <input type="text" id="pincode2" name="pincode2" class="patternlock2" />
+                                    <input type="submit" value="login" data-target="/basic/rawtx/" />
+				</div>
+                            </div>
+                        </div>
+                        <div class="span2">
+                            <h3><span class="pull-right" id="qr_addr"></span></h3>
+                            <div class="pull-right" id="qr"></div>
+                        </div>
+
+                    </div>
+                </div>
+	     </fieldset>
+            </form>
+        <hr /> 
+    </div>
+
+<!-- FAQ -->
+{% if active_tab_faq %}
+        <div class="tab-pane fade in active" id="faq">
+{% else %}
+        <div class="tab-pane fade" id="faq">
+{% endif %}
+            <fieldset> <legend>FAQ</legend>
+                            <div class="control-group">
+				<textarea name="faq" class="span5" id="faq" readonly rows="20" value="{{ faq }}"></textarea>
+                            </div>
+	    </fieldset>
+	</div>
+
+<!-- Backup -->
+{% if active_tab_backup %}
+        <div class="tab-pane fade in active" id="backup">
+{% else %}
+        <div class="tab-pane fade" id="backup">
+{% endif %}
+            <fieldset> <legend>Credentials backup *</legend>
+				<br />
+                                <label class="lead" for="export"><a href="/basic/export" target="_blank">Export credentials</a>. Get the credentials (token, pub key, secure address, etc) kept as cookies in the browser in JSON format.</label> 
+                                <label class="lead" for="export"><a href="/basic/qrexport" target="_blank">Export credentials as QR code</a>. Get the credentials in JSON format as QR code.</label> 
+                                <label class="lead" for="import"><a href="/basic/import" target="_blank">Import credentials</a>. Load previous credentials into this browser.</label> 
+				<p>* Exporting and importing credentials  save you the need to go through key generation procedure on a different device.</p>
+				<br />
+	    </fieldset>
+	</div>
+
+<!-- About -->
+{% if active_tab_about %}
+        <div class="tab-pane fade in active" id="about">
+{% else %}
+        <div class="tab-pane fade" id="about">
+{% endif %}
+            <fieldset> <legend>About</legend>
+                            <div class="control-group">
+				<textarea name="about" class="span5" id="about" readonly rows="20" value="{{ about }}"></textarea>
+                            </div>
+	    </fieldset>
+	</div>
+
+    </div>
+    <FOOTER> 
+
+    <p>&copy; uBTC Bank 2012 <span class="pull-right"><small>Powered by 
+    <a href="http://bitcoin.org">Bitcoin</a>, 
+    <a href="https://blockchain.info">Blockchain</a>, 
+    <a href="https://github.com/brainwallet/brainwallet.github.com">Brainwallet</a>, 
+    <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>, 
+    <a href="https://djangoproject.com">Django</a> and 
+    <a href="http://blog.stef.be/patternlock">Pattern Lock</a>
+    </small></span></p> 
+    </FOOTER> 
+</div>
+</body>
+</html> 
