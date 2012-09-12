@@ -64,8 +64,8 @@ class SecureAddr(models.Model):
 	secondary_addr = models.ForeignKey(Key)
 	secure_addr = models.CharField(max_length=200)
 	creation_time = models.DateTimeField('creation time', auto_now_add=True)
-	balance = models.PositiveIntegerField(default=0) # for statistics only. updated externally.
-	txlogs = models.ManyToManyField("TxLog")
+	balance = models.BigIntegerField(default=0) # for statistics only. updated externally.
+	txlogs = models.ManyToManyField("TxLog", blank=True)
 	objects = SecureAddrManager()
 	def __unicode__(self):
 		return self.secure_addr
@@ -75,8 +75,8 @@ class TxLog(models.Model):
 	from_addr = models.ForeignKey(SecureAddr)
 	to_addr = models.CharField(max_length=200)
 	change_addr = models.CharField(max_length=200)
-	amount = models.PositiveIntegerField(default=0)
-	fee = models.PositiveIntegerField(default=0)
+	amount = models.BigIntegerField(default=0)
+	fee = models.BigIntegerField(default=0)
 	creation_time = models.DateTimeField('creation time', auto_now_add=True)
 	generating_ip_addr = models.IPAddressField(max_length=200, default='127.0.0.1')
 	generating_client = models.CharField(max_length=200, default='unknown')
