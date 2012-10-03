@@ -307,7 +307,12 @@ def action(request, action_type):
 							"vout":int(in_tx['tx_output_n']), "scriptPubKey":str(in_tx['script'])})
 				else:
 					return show_error(request, 'No unspent outputs for address '+str(from_addr))
-				out_set={str(to_addr):float(amount),str(change_addr):float(value+0.0)/100000000-float(amount)-float(fee)}
+				change=float(value+0.0)/100000000-float(amount)-float(fee)
+				if change > 0:
+					# add change to tx only if it is non zero
+					out_set={str(to_addr):float(amount),str(change_addr):change}
+				else:
+					out_set={str(to_addr):float(amount)}
 				rawtx=createrawtransaction(in_array,out_set)
 
 				try:   
